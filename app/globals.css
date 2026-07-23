@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+:root {
+  --font-inter: 'Inter', system_ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+
+  /* EarnTap Orange + White Theme */
+  --primary: #FF6B00;
+  --primary-dark: #E55A00;
+  --primary-light: #FF8C33;
+  --success: #00C853;
+  --success-light: #E8F5E9;
+  --warning: #FFB300;
+  --background: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface-secondary: #F1F3F5;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border: #E5E7EB;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+/* Card Styles */
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 15px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+}
+
+.btn-secondary {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 6px;
+  background: #E5E7EB;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--primary), var(--primary-light));
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mission Card */
+.mission-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.mission-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.1);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  background: white;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item.active svg {
+  color: var(--primary);
+}
+
+/* Telegram-style elements */
+.telegram-badge {
+  background: #E8F5E9;
+  color: #00C853;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Balance Display */
+.balance-card {
+  background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 20px rgba(255, 107, 0, 0.25);
+}
+
+/* Task Status */
+.status-claimed {
+  background: #E8F5E9;
+  color: #00C853;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-go {
+  background: #FFF3E0;
+  color: #FF6B00;
+  padding: 4px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Spin Wheel */
+.spin-wheel {
+  transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .mission-card {
+    padding: 16px;
+  }
+}
