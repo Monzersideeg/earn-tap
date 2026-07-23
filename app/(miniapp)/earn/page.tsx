@@ -1,106 +1,61 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, Users, Gift, TrendingUp, Clock } from 'lucide-react';
+import { Play, Users, TrendingUp, Gift } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTelegram } from '@/lib/telegram';
-
-interface AdTask {
-  id: number;
-  title: string;
-  description: string;
-  reward: number;
-  progress: number;
-  total: number;
-}
-
-interface ChannelTask {
-  id: number;
-  title: string;
-  channel: string;
-  reward: number;
-  status: 'available' | 'claimed';
-}
+import AdPlayer from '@/components/AdPlayer';
+import { AdResult } from '@/lib/ads';
 
 export default function EarnPage() {
   const { user, isReady } = useTelegram();
-  const [balance] = useState(1240);
-  const [todayEarned] = useState(185);
+  const [balance, setBalance] = useState(1240);
+  const [todayEarned, setTodayEarned] = useState(185);
+  const [showAdPlayer, setShowAdPlayer] = useState(false);
 
-  const adTasks: AdTask[] = [
-    { id: 1, title: "Watch 10 ads", description: "Watch real rewarded placements", reward: 150, progress: 6, total: 10 },
-    { id: 2, title: "Watch 5 video ads", description: "Premium video content", reward: 95, progress: 2, total: 5 },
-  ];
-
-  const channelTasks: ChannelTask[] = [
-    { id: 1, title: "Join Telegram channel", channel: "@EarnTapOfficial", reward: 100, status: 'claimed' },
-    { id: 2, title: "Join Telegram channel", channel: "@EarnTapRewards", reward: 80, status: 'available' },
-  ];
-
-  const handleWatchAd = (taskId: number) => {
-    const task = adTasks.find(t => t.id === taskId);
-    toast.loading("Opening ad player...", { id: `ad-${taskId}` });
+  const handleAdComplete = (result: AdResult) => {
+    setBalance(prev => prev + result.reward);
+    setTodayEarned(prev => prev + result.reward);
+    setShowAdPlayer(false);
     
-    setTimeout(() => {
-      toast.success(`+${task?.reward} ACN earned!`, { 
-        id: `ad-${taskId}`,
-        description: "Thank you for watching"
-      });
-    }, 2200);
-  };
-
-  const handleJoinChannel = (task: ChannelTask) => {
-    if (task.status === 'claimed') {
-      toast.info("Already claimed");
-      return;
-    }
-    toast.loading(`Joining ${task.channel}...`, { id: `channel-${task.id}` });
-
-    setTimeout(() => {
-      toast.success(`+${task.reward} ACN earned!`, { 
-        id: `channel-${task.id}`,
-        description: "Channel joined successfully"
-      });
-    }, 1600);
+    toast.success(`+${result.reward} ACN earned!`, {
+      description: `Thank you for watching`,
+    });
   };
 
   if (!isReady) {
-    return <div className="flex h-[60vh] items-center justify-center">Loading...</div>;
+    return <div className="flex h-64 items-center justify-center">Loading...</div>;
   }
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Welcome Header */}
+      {/* Header - Matching Original Screenshot */}
       <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#FF6B00] rounded-full flex items-center justify-center text-white font-bold">
-              {user?.first_name?.[0] || 'U'}
-            </div>
-            <div>
-              <div className="font-semibold">WELCOME BACK</div>
-              <div className="text-sm text-[#6B7280]">@{user?.username || 'user'} • PRO</div>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#FF6B00] rounded-full flex items-center justify-center text-white font-bold text-lg">
+            D
+          </div>
+          <div>
+            <div className="font-bold text-xl">WELCOME BACK</div>
+            <div className="text-sm text-[#6B7280]">@{user?.username || 'demo_user'} • PRO</div>
           </div>
         </div>
         
         <div className="text-right">
-          <div className="flex items-center gap-1.5 justify-end">
-            <div className="text-[#FF6B00] font-bold text-xl">{balance}</div>
-            <div className="text-xs text-[#6B7280]">ACN</div>
-          </div>
-          <div className="text-[10px] text-[#6B7280]">≈ $1.24</div>
+          <div className="text-[#FF6B00] font-bold text-4xl tabular-nums">{balance}</div>
+          <div className="text-xs text-[#6B7280] -mt-1">ACN ≈ $1.24</div>
         </div>
       </div>
 
-      {/* Today's Earnings Banner */}
-      <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB] flex items-center justify-between">
-        <div>
-          <div className="text-xs text-[#6B7280]">TODAY'S EARNINGS</div>
-          <div className="text-3xl font-bold text-[#FF6B00]">+{todayEarned} ACN</div>
-        </div>
-        <div className="text-right">
-          <div className="inline-flex items-center gap-1 bg-[#E8F5E9] text-[#00C853] px-3 py-1 rounded-full text-xs font-semibold">
+      {/* Today's Earnings */}
+      <div className="bg-white rounded-2xl p-5 border border-[#E5E7EB]">
+        <div className="text-xs text-[#6B7280]">TODAY'S EARNINGS</div>
+        <div className="flex items-end justify-between mt-1">
+          <div>
+            <div className="text-[#FF6B00] text-5xl font-bold">+{todayEarned}</div>
+            <div className="text-2xl font-bold text-[#FF6B00]">ACN</div>
+          </div>
+          <div className="bg-[#E8F5E9] text-[#00C853] px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> +32% from yesterday
           </div>
         </div>
@@ -109,7 +64,7 @@ export default function EarnPage() {
       {/* Today's Missions Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="font-semibold text-xl">Today's Missions</div>
+          <div className="font-bold text-2xl">Today's Missions</div>
           <div className="text-sm text-[#6B7280]">Complete tasks daily to earn high bonus rewards</div>
         </div>
         <div className="bg-[#E8F5E9] text-[#00C853] px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
@@ -117,130 +72,78 @@ export default function EarnPage() {
         </div>
       </div>
 
-      {/* Watch Ads Section */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="bg-[#FFF3E0] p-1.5 rounded-xl">
-            <Play className="w-5 h-5 text-[#FF6B00]" />
+      {/* Watch Ads Card - Matching Original */}
+      <div 
+        onClick={() => setShowAdPlayer(true)}
+        className="bg-white rounded-2xl p-5 border-2 border-[#FF6B00] active:scale-[0.985] transition-transform cursor-pointer"
+      >
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 bg-[#FFF3E0] rounded-2xl flex items-center justify-center flex-shrink-0">
+            <Play className="w-6 h-6 text-[#FF6B00]" />
           </div>
-          <div>
-            <div className="font-semibold text-lg">Watch Ads</div>
-            <div className="text-xs text-[#6B7280]">Highest paying tasks right now</div>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {adTasks.map((task) => (
-            <div key={task.id} className="mission-card">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#FFF3E0] rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Play className="w-5 h-5 text-[#FF6B00]" />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-lg">{task.title}</div>
-                      <div className="text-sm text-[#6B7280]">{task.description}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-[#FF6B00]">+{task.reward} ACN</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex items-center gap-3">
-                    <div className="flex-1">
-                      <div className="progress-bar">
-                        <div className="progress-fill" style={{ width: `${(task.progress / task.total) * 100}%` }} />
-                      </div>
-                    </div>
-                    <div className="text-xs text-[#6B7280] tabular-nums">
-                      {task.progress}/{task.total}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex justify-end">
-                    <button 
-                      onClick={() => handleWatchAd(task.id)}
-                      className="btn-primary px-8 py-2 text-sm flex items-center gap-2"
-                    >
-                      <Play className="w-4 h-4" /> Watch Now
-                    </button>
-                  </div>
-                </div>
+          
+          <div className="flex-1">
+            <div className="flex justify-between">
+              <div>
+                <div className="font-bold text-xl">Watch 10 ads</div>
+                <div className="text-[#6B7280]">Watch real rewarded placements</div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-[#FF6B00] text-xl">+150 ACN</div>
               </div>
             </div>
-          ))}
+
+            <div className="mt-4">
+              <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                <div className="h-full bg-[#FF6B00] w-[60%]" />
+              </div>
+              <div className="text-xs text-[#6B7280] mt-1.5">6/10</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Join Telegram Channels Section */}
+      {/* Join Channel */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="bg-[#E8F5E9] p-1.5 rounded-xl">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 bg-[#E8F5E9] rounded-2xl flex items-center justify-center">
             <Users className="w-5 h-5 text-[#00C853]" />
           </div>
           <div>
-            <div className="font-semibold text-lg">Join Telegram Channels</div>
-            <div className="text-xs text-[#6B7280]">Verified membership • Instant reward</div>
+            <div className="font-bold text-xl">Join Telegram channel</div>
           </div>
         </div>
 
-        <div className="space-y-3">
-          {channelTasks.map((task) => (
-            <div key={task.id} className="mission-card">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#E8F5E9] rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-[#00C853]" />
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-lg">{task.title}</div>
-                      <div className="text-sm text-[#00C853] font-medium">{task.channel}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-[#FF6B00]">+{task.reward} ACN</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex justify-end">
-                    {task.status === 'claimed' ? (
-                      <div className="status-claimed flex items-center gap-1.5">✓ Claimed</div>
-                    ) : (
-                      <button 
-                        onClick={() => handleJoinChannel(task)}
-                        className="btn-primary px-7 py-2 text-sm"
-                      >
-                        Join &amp; Claim
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+        <div className="bg-white rounded-2xl p-5 border border-[#E5E7EB]">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="font-semibold">@EarnTapOfficial</div>
+              <div className="text-sm text-[#6B7280]">+100 ACN</div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3 pt-2">
-        <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
-          <div className="text-xs text-[#6B7280]">Ads watched today</div>
-          <div className="text-2xl font-bold mt-0.5">18</div>
-        </div>
-        <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
-          <div className="text-xs text-[#6B7280]">Channels joined</div>
-          <div className="text-2xl font-bold mt-0.5">7</div>
-        </div>
-        <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
-          <div className="text-xs text-[#6B7280]">Streak</div>
-          <div className="text-2xl font-bold mt-0.5 flex items-center gap-1">
-            14 <span className="text-sm">days</span>
+            <div className="bg-[#E8F5E9] text-[#00C853] px-4 py-1 rounded-full text-sm font-semibold">
+              ✓ Claimed
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Ad Player Modal */}
+      {showAdPlayer && (
+        <div className="fixed inset-0 bg-black/70 z-[100] flex items-end justify-center">
+          <div className="w-full max-w-[480px] bg-white rounded-t-3xl">
+            <div className="p-4 flex justify-between border-b">
+              <div className="font-semibold">Watch Rewarded Ads</div>
+              <button onClick={() => setShowAdPlayer(false)} className="text-[#6B7280]">Close</button>
+            </div>
+            <div className="p-5">
+              <AdPlayer 
+                onComplete={handleAdComplete}
+                onClose={() => setShowAdPlayer(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

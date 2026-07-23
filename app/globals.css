@@ -173,9 +173,47 @@ body {
   transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Responsive */
+/* Responsive & Bug Fixes */
 @media (max-width: 480px) {
   .mission-card {
     padding: 16px;
   }
+  
+  .nav-item {
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+}
+
+/* Fix for Telegram WebApp */
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+.max-w-\\[480px\\] {
+  max-width: 480px;
+}
+
+/* Improved Card Hover on Mobile */
+@media (hover: none) {
+  .card:hover, .mission-card:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+}
+
+/* Better Button Touch Targets */
+.btn-primary, .btn-secondary {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fix for long usernames */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

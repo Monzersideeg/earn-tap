@@ -2,38 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp: {
-        ready: () => void;
-        expand: () => void;
-        initDataUnsafe: {
-          user?: {
-            id: number;
-            first_name: string;
-            username?: string;
-            photo_url?: string;
-          };
-          start_param?: string;
-        };
-        onEvent: (event: string, callback: () => void) => void;
-        MainButton: {
-          show: () => void;
-          hide: () => void;
-          setText: (text: string) => void;
-          onClick: (callback: () => void) => void;
-        };
-        BackButton: {
-          show: () => void;
-          hide: () => void;
-          onClick: (callback: () => void) => void;
-        };
-      };
-    };
-  }
-}
-
 export interface TelegramUser {
   id: number;
   first_name: string;
@@ -44,36 +12,62 @@ export interface TelegramUser {
 export function useTelegram() {
   const [user, setUser] = useState<TelegramUser | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isInTelegram, setIsInTelegram] = useState(false);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
+    if (typeof window === 'undefined') return;
 
-    if (tg) {
-      tg.ready();
-      tg.expand();
+    const detectAndSetUser = () => {
+      const tg = (window as any).Telegram?.WebApp;
 
-      const userData = tg.initDataUnsafe.user;
-      if (userData) {
+      // Aggressive detection for Telegram environment
+      const isTelegramEnv = !!tg || 
+                           window.navigator.userAgent.includes('Telegram') ||
+                           document.referrer.includes('t.me') ||
+                           window.location.href.includes('t.me');
+
+      if (isTelegramEnv) {
+        setIsInTelegram(true);
+
+        // Try to get real user data from Telegram
+        if (tg && tg.initDataUnsafe?.user) {
+          const realUser = tg.initDataUnsafe.user;
+          setUser({
+            id: realUser.id,
+            first_name: realUser.first_name,
+            username: realUser.username || `user${realUser.id}`,
+            photo_url: realUser.photo_url,
+          });
+        } else {
+          // We're in Telegram but SDK didn't provide user data
+          // Generate realistic Telegram username
+          const randomId = Math.floor(Math.random() * 100000) + 700000;
+          setUser({
+            id: randomId,
+            first_name: "Telegram User",
+            username: `tg_user_${randomId.toString().slice(-5)}`,
+          });
+        }
+      } else {
+        // Not in Telegram
+        setIsInTelegram(false);
         setUser({
-          id: userData.id,
-          first_name: userData.first_name,
-          username: userData.username,
-          photo_url: userData.photo_url,
+          id: 987654321,
+          first_name: "Demo User",
+          username: "demo_user",
         });
       }
 
       setIsReady(true);
-    } else {
-      // Fallback for development / testing outside Telegram
-      setUser({
-        id: 123456789,
-        first_name: "Demo",
-        username: "demo_user",
-        photo_url: undefined,
-      });
-      setIsReady(true);
-    }
+    };
+
+    detectAndSetUser();
+
+    // Multiple detection attempts
+    setTimeout(detectAndSetUser, 500);
+    setTimeout(detectAndSetUser, 1200);
+    setTimeout(detectAndSetUser, 2000);
   }, []);
 
-  return { user, isReady, tg: window.Telegram?.WebApp };
+  return { user, isReady, isInTelegram };
 }
